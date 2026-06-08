@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="SpeakerCard-1M: an evidence-grounded speaker card corpus for in-the-wild speaker verification. Anonymous double-blind review version." />
+  <meta name="theme-color" content="#0f1f2e" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="googlebot" content="noindex,nofollow" />
+  <title>SpeakerCard-1M · Anonymous Submission</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular']
+          },
+          colors: {
+            ink: '#102033',
+            muted: '#587083',
+            paper: '#f7f2e8',
+            card: '#fffaf0',
+            accent: '#e9552f',
+            teal: '#207d76',
+            gold: '#d79b28'
+          },
+          boxShadow: {
+            soft: '0 22px 70px rgba(16, 32, 51, 0.14)'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="bg-paper text-ink antialiased">
+  <div class="site-shell">
+    <header class="hero overflow-hidden">
+      <div class="mx-auto max-w-7xl px-5 pb-16 pt-10 sm:px-8 lg:px-10 lg:pb-20">
+        <nav class="flex items-center justify-between gap-4" aria-label="Top navigation">
+          <a href="#top" class="group inline-flex items-center gap-2 text-sm font-bold tracking-tight text-ink">
+            <span class="grid h-9 w-9 place-items-center rounded-2xl bg-ink text-card shadow-soft">SC</span>
+            <span>SpeakerCard-1M</span>
+          </a>
+          <div class="hidden items-center gap-5 text-sm font-semibold text-muted md:flex">
+            <a class="hover:text-accent" href="#pipeline">Pipeline</a>
+            <a class="hover:text-accent" href="#protocols">Protocols</a>
+            <a class="hover:text-accent" href="#ac-examples">AC-Verify</a>
+            <a class="hover:text-accent" href="#results">Results</a>
+            <a class="hover:text-accent" href="#findings">Findings</a>
+            <a class="hover:text-accent" href="#lalm">LALM</a>
+            <a class="hover:text-accent" href="#examples">Examples</a>
+            <a class="hover:text-accent" href="#release">Release</a>
+          </div>
+        </nav>
+
+        <!-- Section 1: Hero -->
+        <section id="top" class="mx-auto mt-16 max-w-5xl text-center">
+          <h1 class="mx-auto max-w-5xl text-balance text-4xl font-black leading-[1.04] tracking-[-0.045em] text-ink sm:text-5xl lg:text-7xl">
+            SpeakerCard-1M: An Evidence-Grounded Speaker Card Corpus for In-the-Wild Speaker Verification
+          </h1>
+
+          <p class="mx-auto mt-8 max-w-5xl text-pretty text-base font-semibold leading-7 text-ink/80 sm:text-lg">
+            Anonymous Authors
+          </p>
+          <p class="mx-auto mt-5 max-w-5xl text-sm leading-6 text-muted">
+            Affiliations withheld for double-blind review
+          </p>
+          <p class="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-accent">
+            <span>Under double-blind review</span>
+          </p>
+
+          <div class="mt-8 flex justify-center">
+            <div class="headline-strip">
+              <span><b>88.66%</b> pitch counterfactual rejection</span>
+              <span class="sep" aria-hidden="true"></span>
+              <span><b>+11.7% absolute</b> over the strongest audio LLM</span>
+            </div>
+          </div>
+
+          <div class="mt-8 flex flex-wrap justify-center gap-3">
+            <span class="action-button" aria-disabled="true">Paper <span>under review</span></span>
+            <span class="action-button" aria-disabled="true">Code <span>withheld</span></span>
+            <span class="action-button" aria-disabled="true">Dataset <span>withheld</span></span>
+            <button class="action-button" type="button" data-open-bibtex>BibTeX <span>anon</span></button>
+          </div>
+        </section>
+      </div>
+    </header>
+
+    <main>
+      <!-- Section 2: TL;DR -->
+      <section class="mx-auto max-w-6xl px-5 py-10 sm:px-8 lg:px-10">
+        <div class="summary-card">
+          <div class="kicker">TL;DR</div>
+          <div class="mt-4 grid gap-5 md:grid-cols-3">
+            <div class="tldr-block">
+              <div class="tldr-num">Resource</div>
+              <p class="tldr-text"><b>10.2K speakers</b>, <b>56.7K</b> post-QC records, <b>1.78M</b> utterance captions, balanced <b>EN+ZH</b>, with speaker-disjoint hard-negative triplets and field-level probe provenance.</p>
+            </div>
+            <div class="tldr-block">
+              <div class="tldr-num">Method</div>
+              <p class="tldr-text"><b>Tool-first, LLM-last</b>: ten acoustic probes extract field-level evidence; a schema separates stable <b>traits</b> from utterance-level <b>states</b>; an LLM only verbalizes structured fields, never raw audio.</p>
+            </div>
+            <div class="tldr-block">
+              <div class="tldr-num">Benchmarks</div>
+              <p class="tldr-text">Bidirectional <b>T2S-R / S2T-R</b> retrieval + <b>AC-Verify</b> (CF counterfactual rejection, Hard near-miss rejection). A dual-encoder baseline beats eight 7B–30B+ LALMs on pitch by <b>11.7%</b> absolute.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Method overview -->
+      <section id="pipeline" class="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Method overview</span>
+          <h2>Construction pipeline</h2>
+        </div>
+
+        <div class="mt-8 rounded-[2rem] border border-ink/10 bg-card p-4 shadow-soft sm:p-6">
+          <img src="assets/Picture1.png" class="pipeline-image" alt="SpeakerCard-1M construction pipeline: ingestion, acoustic probes, aggregation, bilingual card generation, quality control, and benchmark protocols." />
+        </div>
+
+        <div class="mt-7 grid gap-4 md:grid-cols-5">
+          <div class="stage-chip"><span>1</span>Unified ingestion of VoxCeleb1/2 and CN-Celeb1/2</div>
+          <div class="stage-chip"><span>2</span>Ten probes extract six traits and four utterance states</div>
+          <div class="stage-chip"><span>3</span>Confidence-weighted aggregation builds speaker profiles</div>
+          <div class="stage-chip"><span>4</span>Constrained LLM renders EN/ZH cards in four styles</div>
+          <div class="stage-chip"><span>5</span>QC removes malformed, duplicate, leaky, and inconsistent cards</div>
+        </div>
+      </section>
+
+      <!-- Section 4: Evaluation protocols -->
+      <section id="protocols" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Evaluation protocols</span>
+          <h2>What each metric asks</h2>
+        </div>
+        <p class="mt-4 max-w-4xl text-base leading-7 text-muted">
+          The benchmark is designed to separate retrieval, verification, and attribute grounding. Each protocol uses speaker-disjoint splits; Vox-only retrieval uses a fixed 1K-speaker English gallery, while the bilingual extension additionally reports a 144-speaker clean CN-Celeb gallery.
+        </p>
+
+        <div class="protocol-grid mt-8">
+          <article class="protocol-card">
+            <div class="protocol-label">T2S-R</div>
+            <h3>Text-to-Speaker Retrieval</h3>
+            <p><b>Input:</b> one Speaker Card text, such as <code>short_query</code> or <code>identity_only</code>.</p>
+            <p><b>Candidate set:</b> speaker audio anchors, where each speaker embedding averages up to three utterances.</p>
+            <p><b>Correct if:</b> the matching speaker appears in the top K results.</p>
+            <p class="protocol-example">Example: query “female, Southwestern accent, very low pitch” should retrieve that speaker from a 1K-speaker gallery.</p>
+          </article>
+
+          <article class="protocol-card">
+            <div class="protocol-label">S2T-R</div>
+            <h3>Speaker-to-Text Retrieval</h3>
+            <p><b>Input:</b> a speaker audio anchor.</p>
+            <p><b>Candidate set:</b> one text anchor per candidate speaker, averaged over the three paraphrase variants when applicable.</p>
+            <p><b>Correct if:</b> the matching Speaker Card is ranked in the top K.</p>
+            <p class="protocol-example">Example: an utterance from speaker A should retrieve speaker A’s identity-only card, not a near-miss card with similar demographics.</p>
+          </article>
+
+          <article class="protocol-card">
+            <div class="protocol-label">AC-Verify CF</div>
+            <h3>Counterfactual Rejection</h3>
+            <p><b>Input:</b> audio plus two deterministic trait templates.</p>
+            <p><b>Candidate set:</b> the true identity template and a counterfactual template where exactly one trait is changed.</p>
+            <p><b>Correct if:</b> the true template scores higher than the contradicted one.</p>
+            <p class="protocol-example">Example: “pitch level: very_low” versus the same card with “pitch level: high.” Only the pitch field changes.</p>
+          </article>
+
+          <article class="protocol-card">
+            <div class="protocol-label">AC-Verify Hard</div>
+            <h3>Hard-Negative Rejection</h3>
+            <p><b>Input:</b> audio plus two real Speaker Cards.</p>
+            <p><b>Candidate set:</b> the positive card and a Stage5 mined hard negative that matches coarse traits but differs in finer attributes such as pitch or timbre.</p>
+            <p><b>Correct if:</b> the positive card receives the higher audio-text compatibility score.</p>
+            <p class="protocol-example">Example: two male speakers with the same age band and accent; the model must reject the near-miss card.</p>
+          </article>
+
+          <article class="protocol-card">
+            <div class="protocol-label">SV EER</div>
+            <h3>Traditional Speaker Verification</h3>
+            <p><b>Input:</b> a VoxCeleb trial pair.</p>
+            <p><b>Candidate set:</b> target and nontarget trial labels from VoxCeleb1-O/E/H.</p>
+            <p><b>Correct if:</b> cosine scores separate same-speaker from different-speaker pairs; lower EER is better.</p>
+            <p class="protocol-example">Example: “utt1 vs utt2” is scored using the same WavLM+MHFA audio encoder, without any text input.</p>
+          </article>
+
+          <article class="protocol-card">
+            <div class="protocol-label">LALM / Cascade</div>
+            <h3>External Model Controls</h3>
+            <p><b>Cascade:</b> replaces the audio tower with probe→LLM text and compares texts in BGE-M3 space.</p>
+            <p><b>LALM forced choice:</b> gives an audio language model the same audio and Card A/B, with balanced A/B order.</p>
+            <p><b>Correct if:</b> the matched card is selected or ranked above the contradicted/negative card.</p>
+            <p class="protocol-example">Example: Audio Flamingo, Qwen3-Omni, Gemini 2.5/3.5 Flash, and GPT audio mini answer which of two cards better matches the audio.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Section 4.25: AC-Verify concrete examples -->
+      <section id="ac-examples" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Concrete inputs</span>
+          <h2>What AC-Verify actually compares</h2>
+        </div>
+        <p class="mt-4 max-w-4xl text-base leading-7 text-muted">
+          These are real card pairs sampled from the released test sets. In each panel the model sees one audio clip plus two text candidates and chooses A or B under a balanced forced-choice prompt. CF tests minimal trait flips with LLM-rewritten distractors; Hard uses real cards from different speakers that share coarse traits.
+        </p>
+
+        <!-- CF examples -->
+        <div class="ac-subhead">
+          <span class="kicker text-accent">CF · Counterfactual rejection</span>
+          <h3>One trait flipped, every other phrase preserved verbatim</h3>
+          <p class="ac-sub-meta">The distractor is produced offline by Qwen3-32B-Instruct under a minimal-edit prompt, so style cannot leak the answer (style-symmetric <code class="rounded bg-ink/10 px-1 py-0.5 text-xs font-mono">llm_cf</code> protocol).</p>
+        </div>
+        <div class="ac-grid">
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Gender flip · EN</span>
+              <span class="ac-pair-flip"><code>female</code> → <code>male</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text"><mark class="hl-keep">Female</mark>, approximately 35-45, Mandarin accent, with a very high-pitched voice.</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text"><mark class="hl-flip">Male</mark>, approximately 35-45, Mandarin accent, with a very high-pitched voice.</span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Age flip · EN</span>
+              <span class="ac-pair-flip"><code>25-35</code> → <code>18-24</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text">Female, approximately <mark class="hl-keep">25-35</mark>, Mandarin accent, with a high-pitched voice.</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text">Female, approximately <mark class="hl-flip">18-24</mark>, Mandarin accent, with a high-pitched voice.</span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Accent flip · EN</span>
+              <span class="ac-pair-flip"><code>southwestern</code> → <code>australian</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text">Female, approximately 25-35, <mark class="hl-keep">Southwestern</mark> accent, with a very high-pitched voice.</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text">Female, approximately 25-35, <mark class="hl-flip">Australian</mark> accent, with a very high-pitched voice.</span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Pitch flip · EN</span>
+              <span class="ac-pair-flip"><code>low</code> → <code>very_low</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text">Male, approximately 18-25, Mandarin accent, with a <mark class="hl-keep">low</mark>-pitched voice.</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text">Male, approximately 18-25, Mandarin accent, with a <mark class="hl-flip">very low</mark>-pitched voice.</span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Gender flip · ZH</span>
+              <span class="ac-pair-flip"><code>女性</code> → <code>男性</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text"><mark class="hl-keep">女性</mark>，Southwestern 口音，约 25-35 岁，very_high 音高。</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text"><mark class="hl-flip">男性</mark>，Southwestern 口音，约 25-35 岁，very_high 音高。</span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Pitch flip · ZH</span>
+              <span class="ac-pair-flip"><code>very_high</code> → <code>high</code></span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · matched</span>
+              <span class="ac-side-text">女性，大约 25-35 岁，带有 Mandarin 口音，音高 <mark class="hl-keep">very_high</mark>。</span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · CF</span>
+              <span class="ac-side-text">女性，大约 25-35 岁，带有 Mandarin 口音，音高 <mark class="hl-flip">high</mark>。</span>
+            </div>
+          </article>
+        </div>
+
+        <!-- Hard examples -->
+        <div class="ac-subhead">
+          <span class="kicker text-accent">Hard · Mined hard-negative rejection</span>
+          <h3>Two different real speakers, nearly identical card text</h3>
+          <p class="ac-sub-meta">Hard negatives are mined from real distractor speakers that share gender, age band, accent, and often pitch band with the positive. In the limit shown below, the rendered cards are essentially indistinguishable in text — the model can only solve this task by listening. Train/val/test speakers are speaker-ID disjoint.</p>
+        </div>
+        <div class="ac-grid">
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Hard pair · English male</span>
+              <span class="ac-pair-flip">two speakers, identical profile</span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · positive</span>
+              <span class="ac-side-text">Male, 25-35, England accent, with a low pitch. <code class="text-[0.7rem] text-muted ml-1">id10166</code></span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · hard-neg</span>
+              <span class="ac-side-text">Male, approximately 25-35, England accent, with a low pitch. <code class="text-[0.7rem] text-muted ml-1">id10055</code></span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Hard pair · US female (mid)</span>
+              <span class="ac-pair-flip">two speakers, identical profile</span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · positive</span>
+              <span class="ac-side-text">Female, probably 35-45, US accent, with a mid-pitched voice. <code class="text-[0.7rem] text-muted ml-1">id10117</code></span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · hard-neg</span>
+              <span class="ac-side-text">Female, approximately 35-45, US accent, with a mid-pitched voice. <code class="text-[0.7rem] text-muted ml-1">id10026</code></span>
+            </div>
+          </article>
+
+          <article class="ac-pair-card">
+            <div class="ac-pair-head">
+              <span class="ac-pair-trait">Hard pair · Senior male (60+)</span>
+              <span class="ac-pair-flip">two speakers, identical profile</span>
+            </div>
+            <div class="ac-side ac-side-pos">
+              <span class="ac-tag ac-tag-pos">A · positive</span>
+              <span class="ac-side-text">Male, likely 60+, US accent, low pitch. <code class="text-[0.7rem] text-muted ml-1">id10113</code></span>
+            </div>
+            <div class="ac-side ac-side-neg">
+              <span class="ac-tag ac-tag-neg">B · hard-neg</span>
+              <span class="ac-side-text">Male, 60+, likely US accent, low pitch. <code class="text-[0.7rem] text-muted ml-1">id10901</code></span>
+            </div>
+          </article>
+        </div>
+
+        <p class="panel-note">
+          Why this matters: CF tests whether a model rejects an explicit single-trait contradiction. Hard tests whether it can still pick the correct speaker when the two text candidates are essentially synonymous — only the audio identity differs. CF is largely solvable from text-level reasoning (best LALM: 87.79%); Hard collapses on text alone and exposes the true cross-modal grounding gap. The dual encoder achieves <b>72.53% Hard</b> vs the strongest LALM at 55.28%.
+        </p>
+      </section>
+
+      <!-- Section 4.5: Main results -->
+      <section id="results" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Main results</span>
+          <h2>One corpus, two operating points</h2>
+        </div>
+        <p class="mt-4 max-w-4xl text-base leading-7 text-muted">
+          We release two trained checkpoints from the same audio–text dual encoder. The <b>balanced</b> recipe maximizes attribute discrimination (AC-Verify CF / Hard) while keeping retrieval competitive; the <b>retrieval-specialized</b> recipe continues from a retrieval-push checkpoint and pushes T2S / S2T recall further at a controlled cost to Hard. Numbers below are on the Vox-only 1K-speaker English gallery.
+        </p>
+        <div class="results-panel mt-7">
+          <table class="results-table">
+            <thead>
+              <tr class="group-row">
+                <th rowspan="2">Model</th>
+                <th colspan="3">T2S-R (%)</th>
+                <th colspan="3">S2T-R (%)</th>
+                <th colspan="2">AC-Verify (%)</th>
+              </tr>
+              <tr>
+                <th>R@1</th><th>R@5</th><th>R@10</th>
+                <th>R@1</th><th>R@5</th><th>R@10</th>
+                <th>CF</th><th>Hard</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="subheader"><td colspan="9">Text-only reference</td></tr>
+              <tr>
+                <td>Cascade (probe → LLM card)</td>
+                <td>3.50</td><td>10.10</td><td>15.60</td>
+                <td>1.60</td><td>6.10</td><td>9.30</td>
+                <td>—</td><td>—</td>
+              </tr>
+              <tr class="subheader"><td colspan="9">Ours (audio + text dual encoder)</td></tr>
+              <tr class="ours">
+                <td>Balanced</td>
+                <td>3.00</td><td>15.30</td><td>24.80</td>
+                <td>4.60</td><td>16.00</td><td>25.50</td>
+                <td class="best">93.84</td><td class="best">72.53</td>
+              </tr>
+              <tr class="ours">
+                <td>Retrieval-specialized</td>
+                <td class="best">5.10</td><td class="best">16.60</td><td class="best">27.50</td>
+                <td class="best">5.50</td><td class="best">16.90</td><td class="best">27.30</td>
+                <td>85.45</td><td>65.53</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="panel-note">
+          Cascade replaces the audio tower with the same probe → LLM verbalizer used in corpus construction, matched in BGE-M3 text–text space. The substantially larger gap on S2T (9.30 vs 25.50 at R@10) than on T2S (15.60 vs 24.80) localizes the audio tower's contribution to utterance-to-speaker aggregation rather than text retrieval per se. AC-Verify scores reported here use the style-symmetric LLM-generated counterfactual (llm_cf) protocol. SV EER columns from the paper (Vox1-O/E/H) are omitted here and reported in the manuscript.
+        </p>
+      </section>
+
+      <!-- Section 5: Key findings -->
+      <section id="findings" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Key findings</span>
+          <h2>Where speaker cards change the picture</h2>
+        </div>
+
+        <div class="mt-8 grid gap-5 lg:grid-cols-3">
+          <article class="finding-card finding-card-highlight lg:col-span-1">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3>LALMs are weak on pitch</h3>
+                <p class="subhead">All 8 audio language models stay below 77%</p>
+              </div>
+              <span class="pin">Pitch CF</span>
+            </div>
+            <div class="chart-wrap mt-7" aria-label="Pitch counterfactual forced-choice bar chart">
+              <div class="chance-line" aria-hidden="true"><span>chance</span></div>
+              <div class="bar-grid">
+                <div class="bar-item" style="--value:55.26"><div class="bar"></div><b>55.26</b><span>AF3</span></div>
+                <div class="bar-item" style="--value:49.20"><div class="bar"></div><b>49.20</b><span>Qwen2</span></div>
+                <div class="bar-item" style="--value:69.59"><div class="bar"></div><b>69.59</b><span>Qwen3</span></div>
+                <div class="bar-item" style="--value:70.27"><div class="bar"></div><b>70.27</b><span>MiMo</span></div>
+                <div class="bar-item" style="--value:65.07"><div class="bar"></div><b>65.07</b><span>Kimi</span></div>
+                <div class="bar-item" style="--value:74.74"><div class="bar"></div><b>74.74</b><span>Gem2.5</span></div>
+                <div class="bar-item" style="--value:76.99"><div class="bar"></div><b>76.99</b><span>Gem3.5</span></div>
+                <div class="bar-item" style="--value:70.26"><div class="bar"></div><b>70.26</b><span>GPT</span></div>
+                <div class="bar-item ours" style="--value:88.66"><div class="bar"></div><b>88.66</b><span>Ours</span></div>
+              </div>
+            </div>
+            <p class="caption">
+              On 2-way forced choice with pitch as the differing trait under the LLM-generated counterfactual protocol, all eight LALMs (open and closed, 7B–30B+) score 49–77% (mean 66.4%). Our dual encoder reaches 88.66%, an 11.7% absolute gap over the strongest LALM (Gemini 3.5 Flash).
+            </p>
+          </article>
+
+          <article class="finding-card">
+            <h3>Audio tower vs probe→LLM cascade</h3>
+            <p class="subhead">Direction-dependent contribution</p>
+            <div class="mt-8 grid gap-4">
+              <div class="metric-pill">
+                <span>T2S R@10</span>
+                <strong>15.60 <em>&lt;</em> 24.80</strong>
+                <small>cascade trails dual encoder</small>
+              </div>
+              <div class="metric-pill metric-pill-hot">
+                <span>S2T R@10</span>
+                <strong>9.30 <em>≪</em> 25.50</strong>
+                <small>cascade ≪ dual encoder</small>
+              </div>
+            </div>
+            <p class="caption">
+              A text-only cascade sharing our probe pipeline trails the dual encoder on T2S retrieval and falls further behind on S2T, localizing the audio tower's contribution to utterance-to-speaker aggregation that single-utterance probe-then-verbalize cannot fully recover.
+            </p>
+          </article>
+
+          <article class="finding-card">
+            <h3>Schema enforcement matters</h3>
+            <p class="subhead">Training-time text view ablation</p>
+            <div class="mt-7 overflow-hidden rounded-3xl border border-ink/10">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Training view</th>
+                    <th>T2S@10</th>
+                    <th>S2T@10</th>
+                    <th>CF</th>
+                    <th>Hard</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>detailed<br><span>(no schema)</span></td>
+                    <td>19.30</td>
+                    <td>22.10</td>
+                    <td>86.97</td>
+                    <td>68.03</td>
+                  </tr>
+                  <tr class="selected">
+                    <td>identity_only<br><span>(schema)</span></td>
+                    <td>24.80</td>
+                    <td>25.50</td>
+                    <td>93.84</td>
+                    <td>72.53</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="caption">
+              Removing schema enforcement drops CF by 6.87% absolute and Hard by 4.50% absolute (−6.2% relative); retrieval recall also drops. Under the stricter LLM-generated CF protocol, schema enforcement protects attribute-conditioned verification at least as much as hard-negative discrimination.
+            </p>
+          </article>
+        </div>
+
+        <div class="mt-10">
+          <div class="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 class="text-xl font-black tracking-tight text-ink sm:text-2xl">Eval-time text view is a controllable axis</h3>
+            <span class="text-sm font-semibold text-muted">single balanced checkpoint, four query styles</span>
+          </div>
+          <p class="mt-3 max-w-4xl text-base leading-7 text-muted">
+            Switching only the eval-time text view changes retrieval but leaves AC-Verify flat: <code class="rounded bg-ink/10 px-1.5 py-0.5 text-[0.85em] font-mono text-accent">identity_only</code> matches training and wins on T2S/S2T R@10, while other views degrade accordingly. Hard varies by under 0.4% and CF stays at 93.84% across all four views, since both matched and counterfactual cards are scored under the same view.
+          </p>
+          <div class="results-panel mt-5">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Eval text style</th>
+                  <th>T2S R@1</th><th>T2S R@10</th>
+                  <th>S2T R@1</th><th>S2T R@10</th>
+                  <th>Hard</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>detailed</code></td><td>2.30</td><td>14.80</td><td>2.30</td><td>16.10</td><td>72.30</td></tr>
+                <tr><td><code>identity_only</code></td><td class="best">3.00</td><td class="best">24.80</td><td class="best">4.60</td><td class="best">25.50</td><td class="best">72.53</td></tr>
+                <tr><td><code>technical_report</code></td><td>0.70</td><td>8.60</td><td>2.50</td><td>15.30</td><td>72.17</td></tr>
+                <tr><td><code>short_query</code></td><td>2.70</td><td>16.80</td><td>3.40</td><td>16.40</td><td>72.43</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5.5: Audio language model benchmark -->
+      <section id="lalm" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">AC-Verify zero-shot benchmark</span>
+          <h2>How eight audio language models score on attribute grounding</h2>
+        </div>
+        <p class="mt-4 max-w-4xl text-base leading-7 text-muted">
+          Each model is shown one audio clip and two cards (the matched card and a counterfactual that differs in a single trait, or a mined hard-negative card), and chooses A or B with balanced A/B order. Counterfactuals are LLM-rewrites in the same surface style as the original card (the style-symmetric <code>llm_cf</code> protocol), so the distractor cannot be detected by style alone. CF is the per-trait average across gender, accent, age, and pitch. Higher is better.
+        </p>
+        <div class="results-panel mt-7">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Gender</th><th>Accent</th><th>Age</th><th>Pitch</th>
+                <th>CF</th><th>Hard</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="subheader"><td colspan="7">Open-source</td></tr>
+              <tr><td>Audio Flamingo&nbsp;3</td><td>94.59</td><td>71.88</td><td>56.06</td><td>55.26</td><td>69.45</td><td>50.05</td></tr>
+              <tr><td>Qwen2-Audio-7B</td><td>53.97</td><td>46.28</td><td>52.99</td><td>49.20</td><td>50.61</td><td>49.77</td></tr>
+              <tr><td>Qwen3-Omni-30B</td><td>97.76</td><td>95.37</td><td>80.93</td><td>69.59</td><td>85.91</td><td>55.28</td></tr>
+              <tr><td>MiMo-Audio-7B</td><td>97.45</td><td>70.12</td><td>67.45</td><td>70.27</td><td>76.32</td><td>51.90</td></tr>
+              <tr><td>Kimi-Audio-7B</td><td>94.90</td><td>81.51</td><td>64.44</td><td>65.07</td><td>76.51</td><td>48.58</td></tr>
+              <tr class="subheader"><td colspan="7">Closed-source (API)</td></tr>
+              <tr><td>Gemini&nbsp;2.5&nbsp;Flash</td><td>96.73</td><td>94.62</td><td>75.18</td><td>74.74</td><td>85.32</td><td>53.41</td></tr>
+              <tr><td>Gemini&nbsp;3.5&nbsp;Flash</td><td>97.41</td><td>92.35</td><td>84.40</td><td>76.99</td><td>87.79</td><td>51.72</td></tr>
+              <tr><td>GPT audio mini</td><td>87.50</td><td>60.92</td><td>71.41</td><td>70.26</td><td>72.52</td><td>49.32</td></tr>
+              <tr class="subheader"><td colspan="7">This work</td></tr>
+              <tr class="ours">
+                <td>Ours (dual-task, balanced)</td>
+                <td class="best">95.93</td><td class="best">97.43</td><td class="best">93.33</td><td class="best">88.66</td>
+                <td class="best">93.84</td><td class="best">72.53</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="panel-note">
+          Six of eight LALMs handle gender well (94–98%); accent shows a clear split with Qwen3-Omni and both Gemini variants above 92% versus 46–82% for the rest; age sees only Qwen3-Omni (80.93%) and Gemini&nbsp;3.5&nbsp;Flash (84.40%) above 80%. <b>Pitch is the universal weak point</b>: all eight LALMs score 49–77%, with one model below chance. Our dual encoder reaches 88.66% on pitch without conceding the coarse traits and is the only system above 90% on every per-trait column.
+        </p>
+      </section>
+
+      <!-- Section 5: Speaker Card examples -->
+      <section id="examples" class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Speaker Card examples</span>
+          <h2>Four styles, one real speaker</h2>
+        </div>
+        <p class="mt-4 max-w-3xl text-base leading-7 text-muted">
+          Real captions for <code class="rounded bg-ink/10 px-1.5 py-0.5 text-[0.85em] font-mono text-accent">cnceleb1/id00000</code>, the same speaker referenced across the corpus. Each record exposes four text views so retrieval, verification, and interpretability experiments can choose how much state context to include. Trait phrases (gender, age, accent, pitch) are highlighted in <mark class="hl-trait">orange</mark>; state phrases (emotion, channel, environment, rate) in <mark class="hl-state">teal</mark>; numeric evidence in <mark class="hl-evidence">gold</mark>.
+        </p>
+
+        <div class="mt-8 grid gap-5 md:grid-cols-2">
+          <article class="example-card">
+            <div class="example-title"><span>Detailed</span><code>detailed</code></div>
+            <p><mark class="hl-trait">Female</mark>, <mark class="hl-trait">25-35 years</mark>, <mark class="hl-trait">Southwestern accent</mark>. <mark class="hl-trait">Very high pitch</mark>. <mark class="hl-state">Happy</mark>, <mark class="hl-state">slow speaking rate</mark>, <mark class="hl-state">noisy telephone environment</mark>.</p>
+          </article>
+          <article class="example-card">
+            <div class="example-title"><span>Identity only</span><code>identity_only</code></div>
+            <p><mark class="hl-trait">Female</mark>, approximately <mark class="hl-trait">25-35</mark>, <mark class="hl-trait">Southwestern accent</mark>, with a <mark class="hl-trait">very high-pitched voice</mark>.</p>
+          </article>
+          <article class="example-card">
+            <div class="example-title"><span>Technical Report</span><code>technical_report</code></div>
+            <p>Adult <mark class="hl-trait">female</mark>; age <mark class="hl-trait">25-35</mark> <mark class="hl-evidence">(P=0.514)</mark>; median F0 <mark class="hl-evidence">361 Hz</mark> (<mark class="hl-trait">very high pitch</mark>); jitter <mark class="hl-evidence">15.83%</mark>, shimmer <mark class="hl-evidence">0.56%</mark> (<mark class="hl-trait">raspy phonation</mark>, <mark class="hl-evidence">P=0.657</mark>); habitual speech rate <mark class="hl-state">110.3 wpm</mark> (<mark class="hl-state">slow</mark>).</p>
+          </article>
+          <article class="example-card">
+            <div class="example-title"><span>Short query</span><code>short_query</code></div>
+            <p><mark class="hl-trait">Female</mark>, <mark class="hl-trait">Southwestern</mark>, <mark class="hl-trait">25-35</mark>, <mark class="hl-trait">very high pitch</mark>, <mark class="hl-state">happy</mark>, <mark class="hl-state">slow</mark>, <mark class="hl-state">noisy telephone</mark>.</p>
+          </article>
+        </div>
+
+        <!-- ZH equivalents -->
+        <div class="mt-6 grid gap-5 md:grid-cols-2">
+          <article class="example-card">
+            <div class="example-title"><span>Detailed · ZH</span><code>detailed</code></div>
+            <p>该演讲者为<mark class="hl-trait">女性</mark>，年龄在<mark class="hl-trait">25-35岁</mark>之间，具有<mark class="hl-trait">西南口音</mark>。她的<mark class="hl-trait">音调非常高</mark>，表现出<mark class="hl-state">快乐的情绪</mark>，但录音环境较为<mark class="hl-state">嘈杂</mark>，且通过<mark class="hl-state">电话通道</mark>录制。她的<mark class="hl-state">语速较慢或非常慢</mark>。</p>
+          </article>
+          <article class="example-card">
+            <div class="example-title"><span>Technical Report · ZH</span><code>technical_report</code></div>
+            <p>成年<mark class="hl-trait">女性</mark>；年龄<mark class="hl-trait">25-35岁</mark><mark class="hl-evidence">（P=0.514）</mark>；中位F0 <mark class="hl-evidence">361 Hz</mark>（<mark class="hl-trait">极高音高</mark>，<mark class="hl-evidence">P=0.75</mark>）；jitter <mark class="hl-evidence">15.83%</mark>，shimmer <mark class="hl-evidence">0.56%</mark>（<mark class="hl-trait">嘶哑发音</mark>，<mark class="hl-evidence">P=0.657</mark>）；习惯语速 <mark class="hl-state">110.3 wpm</mark>（<mark class="hl-state">缓慢</mark>）。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="stats-ribbon">
+          <div><b>10.2K</b><span>speakers</span></div>
+          <div><b>56.7K</b><span>post-QC cards</span></div>
+          <div><b>1.78M</b><span>utterance captions</span></div>
+          <div><b>189K</b><span>Vox-only train triplets</span></div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="section-heading">
+          <span class="kicker">Vox+CN extension</span>
+          <h2>Bilingual transfer snapshot</h2>
+        </div>
+        <p class="mt-4 max-w-4xl text-base leading-7 text-muted">
+          Vox-only and Vox+CN use different training pools, validation sets, and test galleries, so the bilingual rows are reported as an extension snapshot rather than a strict same-gallery comparison.
+        </p>
+        <div class="mt-7 overflow-hidden rounded-3xl border border-ink/10 bg-card shadow-soft">
+          <table class="mini-table transfer-table">
+            <thead>
+              <tr>
+                <th>Train</th>
+                <th>Test</th>
+                <th>Gallery</th>
+                <th>T2S@10</th>
+                <th>S2T@10</th>
+                <th>CF</th>
+                <th>Hard</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>EN</td><td>EN</td><td>1000</td><td>25.00</td><td>25.40</td><td>93.90</td><td>72.13</td></tr>
+              <tr><td>EN</td><td>ZH</td><td>144</td><td>31.94</td><td>31.25</td><td>70.34</td><td>70.37</td></tr>
+              <tr><td>ZH</td><td>EN</td><td>1000</td><td>7.50</td><td>6.90</td><td>71.30</td><td>62.20</td></tr>
+              <tr><td>ZH</td><td>ZH</td><td>144</td><td>57.64</td><td>59.03</td><td>90.49</td><td>74.77</td></tr>
+              <tr class="selected"><td>Bilingual</td><td>EN</td><td>1000</td><td>22.40</td><td>25.60</td><td>93.60</td><td>73.97</td></tr>
+              <tr class="selected"><td>Bilingual</td><td>ZH</td><td>144</td><td>53.47</td><td>62.50</td><td>90.67</td><td>74.77</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="release" class="mx-auto max-w-6xl px-5 py-14 sm:px-8 lg:px-10">
+        <div class="release-card">
+          <div>
+            <span class="kicker">Release · withheld during review</span>
+            <h2 class="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Annotation layer, protocols, and baselines</h2>
+            <p class="mt-4 max-w-3xl text-base leading-7 text-muted">
+              SpeakerCard-1M releases metadata and benchmark protocols only. Original VoxCeleb/CN-Celeb audio is not redistributed; released audio identifiers are source-relative lookup keys. All public release links (dataset card, reproduction code) are withheld until camera-ready to preserve anonymity under double-blind review.
+            </p>
+          </div>
+          <div class="mt-7 flex flex-wrap gap-3">
+            <span class="action-button action-button-dark" aria-disabled="true">Dataset card <span>withheld</span></span>
+            <span class="action-button action-button-dark" aria-disabled="true">Reproduction code <span>withheld</span></span>
+            <button class="action-button action-button-dark" type="button" data-open-bibtex>Cite (anonymous)</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mx-auto max-w-7xl px-5 pb-10 pt-4 text-center text-sm text-muted sm:px-8 lg:px-10">
+      <p>Anonymous double-blind review version · no analytics, no tracking · author identity withheld until camera-ready.</p>
+    </footer>
+  </div>
+
+  <div id="bibtex-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bibtex-title">
+    <div class="modal-card">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="kicker">Citation</p>
+          <h2 id="bibtex-title" class="mt-2 text-2xl font-black">BibTeX</h2>
+        </div>
+        <button class="modal-close" type="button" data-close-bibtex aria-label="Close BibTeX modal">×</button>
+      </div>
+      <pre id="bibtex-text" class="mt-5 overflow-auto rounded-2xl bg-ink p-5 text-sm leading-6 text-card"><code>@misc{anonymous2026speakercard,
+  title     = {SpeakerCard-1M: An Evidence-Grounded Speaker Card Corpus for In-the-Wild Speaker Verification},
+  author    = {Anonymous Authors},
+  note      = {Under double-blind review. Author identities withheld; cite the venue-assigned anonymous handle until camera-ready},
+  year      = {2026}
+}</code></pre>
+      <div class="mt-5 flex justify-end gap-3">
+        <button id="copy-bibtex" class="action-button action-button-dark" type="button">Copy BibTeX</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('bibtex-modal');
+    const openers = document.querySelectorAll('[data-open-bibtex]');
+    const closers = document.querySelectorAll('[data-close-bibtex]');
+    const copyButton = document.getElementById('copy-bibtex');
+    const bibtexText = document.getElementById('bibtex-text');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      copyButton.focus();
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    openers.forEach((button) => button.addEventListener('click', openModal));
+    closers.forEach((button) => button.addEventListener('click', closeModal));
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+    copyButton.addEventListener('click', async () => {
+      const text = bibtexText.innerText.trim();
+      await navigator.clipboard.writeText(text);
+      copyButton.textContent = 'Copied';
+      setTimeout(() => { copyButton.textContent = 'Copy BibTeX'; }, 1400);
+    });
+  </script>
+</body>
+</html>
